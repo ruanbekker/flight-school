@@ -1,0 +1,118 @@
+cloud_provider:
+  mbus: https://mbus:kj4b649jspfg7duyxa9p@192.168.100.4:6868
+  properties:
+    agent:
+      mbus: https://mbus:kj4b649jspfg7duyxa9p@0.0.0.0:6868
+    blobstore:
+      path: /var/vcap/micro_bosh/data/cache
+      provider: local
+    ntp:
+    - time1.google.com
+    - time2.google.com
+    - time3.google.com
+    - time4.google.com
+  template:
+    name: virtualbox_cpi
+    release: bosh-virtualbox-cpi
+disk_pools:
+- disk_size: 32768
+  name: disks
+instance_groups:
+- instances: 1
+  jobs:
+  - name: atc
+    properties:
+      external_url: http://192.168.100.4:8080
+      log_level: debug
+      no_really_i_dont_want_any_auth: true
+      postgresql:
+        database: atc
+        host: 127.0.0.1
+        role:
+          password: uv7qfv14zudb8bc36ops
+        sslmode: disable
+    release: concourse
+  - name: tsa
+    properties:
+      log_level: debug
+    release: concourse
+  - name: postgresql
+    properties:
+      databases:
+      - name: atc
+        password: uv7qfv14zudb8bc36ops
+        role: atc
+    release: concourse
+  - name: groundcrew
+    properties:
+      baggageclaim:
+        url: http://127.0.0.1:7788
+      drain_timeout: 10m
+      tsa:
+        host: 127.0.0.1
+        port: 2222
+    release: concourse
+  - name: baggageclaim
+    properties:
+      log_level: debug
+    release: concourse
+  - name: garden
+    properties:
+      garden:
+        allow_host_access: true
+        listen_address: 0.0.0.0:7777
+        listen_network: tcp
+    release: garden-runc
+  name: concourse
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: default
+    static_ips:
+    - 192.168.100.4
+  - name: outbound
+  persistent_disk_pool: disks
+  resource_pool: vms
+name: concourse-paper-plane
+networks:
+- name: default
+  subnets:
+  - dns:
+    - 8.8.8.8
+    gateway: 192.168.100.1
+    range: 192.168.100.0/24
+    static_ips: 192.168.100.4
+  type: manual
+- cloud_properties:
+    name: outbound
+    type: natnetwork
+  name: outbound
+  type: dynamic
+releases:
+- name: concourse
+  sha1: 4e6f88c9f71f5bf7bbc8f667e5bff96462befbcc
+  url: https://github.com/concourse/concourse/releases/download/v3.5.0/concourse-3.5.0-3445.11.tgz
+  version: 3.5.0
+- name: garden-runc
+  sha1: 58fbc64aff303e6d76899441241dd5dacef50cb7
+  url: https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=1.6.0
+  version: 1.6.0
+- name: bosh-virtualbox-cpi
+  sha1: 537c77b087eeda859b1eb89553efa6f808214d50
+  url: https://bosh.io/d/github.com/cppforlife/bosh-virtualbox-cpi-release?v=0.0.12
+  version: 0.0.12
+resource_pools:
+- cloud_properties:
+    cpus: 2
+    ephemeral_disk: 32768
+    memory: 4096
+  env:
+    bosh:
+      password: '*'
+  name: vms
+  network: default
+  stemcell:
+    sha1: 1b52eeb8e82968975e19ecb37f4b2c27078dcbf6
+    url: https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent?v=3445.11
+variables: []
