@@ -9,4 +9,5 @@ pushd flight-school
   ip=$(curl ip.ruanbekker.com)
   echo $ip
   echo "ending"
+  echo "ending again"
 popd
