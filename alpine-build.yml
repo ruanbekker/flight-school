@@ -1,0 +1,15 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: 
+    repository: alpine
+    tag: edge
+
+inputs:
+  - name: flight-school-alpine
+
+run:
+  path: ./flight-school/ci/alpine.sh
+
+
