@@ -7,7 +7,7 @@ image_resource:
     tag: edge
 
 inputs:
-  - name: flight-school-alpine
+  - name: flight-school
 
 run:
   path: ./flight-school/ci/alpine.sh

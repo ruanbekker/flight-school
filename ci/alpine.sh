@@ -4,3 +4,4 @@ set -e -x
 
   echo "$hostname"
   echo "This is running on a alpine image"
+  echo "end of script"
